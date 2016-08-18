@@ -136,21 +136,21 @@ class BCacheReq(Requirement):
 
 def mk_dm(devname, table, readonly, exit_stack):
     needs_udev_fallback = False
-    cmd = 'dmsetup create --noudevsync --'.split() + [devname]
+    cmd = 'dmsetup create --'.split() + [devname]
     if readonly:
-        cmd[3:3] = ['--readonly']
+        cmd[2:2] = ['--readonly']
     proc = subprocess.Popen(cmd, stdin=subprocess.PIPE)
     proc.communicate(table.encode('ascii'))
     if proc.returncode != 0:
         needs_udev_fallback = True
         # dmsetup 1.02.65, wheezy/quantal
-        cmd[3:3] = ['--verifyudev']
+        cmd[2:2] = ['--verifyudev']
         proc = subprocess.Popen(cmd, stdin=subprocess.PIPE)
         proc.communicate(table.encode('ascii'))
         assert proc.returncode == 0, 'Report to https://github.com/g2p/blocks/issues/8 if you see this'
-    cmd = 'dmsetup remove --noudevsync --'.split() + [devname]
+    cmd = 'dmsetup remove --'.split() + [devname]
     if needs_udev_fallback:
-        cmd[3:3] = ['--verifyudev']
+        cmd[2:2] = ['--verifyudev']
     exit_stack.callback(lambda: quiet_call(cmd))
 
 
